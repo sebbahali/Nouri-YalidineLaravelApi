@@ -27,7 +27,7 @@ class Yalidine
     }
 
     /**
-     * Perform a HTTP request to Yalidine API
+     * Perform an HTTP request to Yalidine API
      *
      * @param string $method HTTP method (GET, POST, DELETE, etc.)
      * @param string $endpoint API endpoint path
