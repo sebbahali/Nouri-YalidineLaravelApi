@@ -1,78 +1,84 @@
-#Yalidine-Dz-Laravel-Api
+# Yalidine-Dz-Laravel-Api
 
-laravel package For Yalidine Api
+laravel package For Yalidine Api Integrations.
 
-in composer.json
-
+## Installation 
+1. in your composer.json, update:
 ```json
-    "minimum-stability": "dev"
+"minimum-stability": "dev"
 ```
 
-then
+2. Using your CLI, install the package via `composer` as follows:
 
 ```bash
 composer require sebbahnouri/yalidine
 ```
 
-#add in config app.php
-in providers
+3. The package service provider will be automatically loaded by Laravel once installed. You can also register the package service provider manually in the `providers` array within your `config.php`:
 
 ```php
-  Sebbahnouri\Yalidine\Providers\YaledineServiceProvider::class
+"providers" => [
+    ..
+    Sebbahnouri\Yalidine\Providers\YaledineServiceProvider::class
+]
 ```
-
-#publish the config file
-
+4. Publish the package configuration file:
 ```bash
 php artisan vendor:publish --tag=Yale-config
 ```
 
-# then add in your env file
+5. Inject your Yalidin credentials to your `.env` file:
 
 ```bash
 API_ID=******
 API_TOKEN=*******
 ```
 
-take it from Yalidine website https://www.yalidine.com/
+If you don't have any, make sure you obtain them from this [Yaldine Official Website](https://www.yalidine.com/).
 
-#invoke the singleton
+
+## Usage
+1. invoke the singleton
 
 ```php
 use Sebbahnouri\Yalidine\Yalidine;
 
 $yalidine = app(Yalidine::class);
+
+# usage example
+$yalidine->method($params);
 ```
 
-#Retrieve the parcels
+## Available methods
+### Retrieve the parcels
 
 ```php
-$yalidine->retrieveParcels()  for all the parcels
+$yalidine->retrieveParcels()  # for all the parcels
 ```
 
 or
 
 ```php
-$trackings=['yal-205643','yal-454FU'];
+$trackings = ['yal-205643','yal-454FU'];
 
 $yalidine->retrieveParcels($trackings);
 ```
 
-#Retrieve the Histories
-to get all
+### Retrieve the Histories
+to get all histories
 
 ```php
-$status='';
+$yalidine->deliveredParcels()
 ```
 
-or
+Or, per status as follows:
 
 ```php
- $status='Livré';
- $yalidine->deliveredParcels($status)
+$status = 'Livré';
+$yalidine->deliveredParcels($status)
 ```
 
-#Create the parcels
+### Create the parcels
 
 ```php
 $parcels = array( // the array that contains all the parcels
@@ -119,31 +125,31 @@ $parcels = array( // the array that contains all the parcels
      array ( // third parcel
          ...
      ),
-     array( // etc
+     array( // Add as much as you want ..
          ...
      )
- );
+);
 
-
-
-$yalidine->createParcels($parcels)
+$yalidine->createParcels($parcels);
 ```
 
-#Delete the parcels
+### Delete the parcels
 
 ```php
-$trackings=['yal-205643','yal-454FU'];
-$yalidine->deleteParcels($trackings)
+$trackings = ['yal-205643','yal-454FU'];
+
+$yalidine->deleteParcels($trackings);
 ```
 
-#Retrieve the delivery fees
+### Retrieve the delivery fees
 
+Retrieve results for certain wilayas:
 ```php
-$wilaya_id=['13','14'];
-$yalidine->retrieveDeliveryfees($wilaya_id);
+$wilayas_id = ['13','14'];
+$yalidine->retrieveDeliveryfees($wilaya_ids);
 ```
 
-#or all using
+Or for all:
 
 ```php
 $yalidine->retrieveDeliveryfees();
