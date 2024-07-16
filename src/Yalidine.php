@@ -6,111 +6,106 @@ use Illuminate\Support\Facades\Log;
 
 class Yalidine
 {
-
     private string $url = "https://api.yalidine.com/v1/";
     private string $apiId;
     private string $apiToken;
-
+    private Client $client;
 
     public function __construct()
     {
         $this->apiId = config('Yale-config.api_id');
         $this->apiToken = config('Yale-config.api_token');
+
+        $this->client = new Client([
+            'base_uri' => $this->url,
+            'headers' => [
+                'X-API-ID' => $this->apiId,
+                'X-API-TOKEN' => $this->apiToken,
+                'Content-Type' => 'application/json'
+            ]
+        ]);
     }
 
-    public function retrieveParcels(array $trackings = [])
-    {
-        $options = [];
-        if ($trackings) {
-            $tracking = implode(',', $trackings);
-            $options['query'] = [
-                'tracking' => $tracking
-            ];
-        }
-
-        $response = $this->request('GET', 'parcels', $options);
-        //TODO:create a jsonserialize class to represent the response
-        return $response;
-    }
-    public function createParcels(array $parcels)
-    {
-        $options = [
-            'json' => $parcels
-        ];
-
-        $response = $this->request('POST', 'parcels', $options);
-        //TODO:create a jsonserialize class to represent the response
-        return $response;
-    }
-
-    public function deleteParcels(array $trackings)
-    {
-        $options = [];
-        if ($trackings) {
-            $tracking = implode(',', $trackings);
-            $options['query'] = [
-                'tracking' => $tracking
-            ];
-        }
-
-        $response = $this->request('DELETE', 'parcels', $options);
-        //TODO:create a jsonserialize class to represent the response
-        return $response;
-    }
-    public function retrieveDeliveryfees(array $wilayaIds = [])
-    {
-        $options = [];
-        if ($wilayaIds) {
-            $wilayaIds = implode(',', $wilayaIds);
-            $options['query'] = [
-                'wilaya_id' => $wilayaIds
-            ];
-        }
-
-        $response = $this->request('GET', 'deliveryfees', $options);
-        //TODO:create a jsonserialize class to represent the response
-        return $response;
-    }
-
-    public function retrieveHistoryParcels(?string $status) // the param should be an enum of all the status 
-    {
-        $options = [];
-        if ($status) {
-            $options['query'] = [
-                'status' => $status
-            ];
-        }
-
-        $response = $this->request('GET', 'histories', $options);
-        //TODO:create a jsonserialize class to represent the response
-        return $response; 
-    }
-
-
-    private function request(string $method, string $endpoint, array $options): ?array
+    /**
+     * Perform an HTTP request to Yalidine API
+     *
+     * @param string $method HTTP method (GET, POST, DELETE, etc.)
+     * @param string $endpoint API endpoint path
+     * @param array $options Request options (query, json payload, etc.)
+     * @return array|null Response data as an associative array or null on failure
+    */
+    private function request(string $method, string $endpoint, array $options = []): ?array
     {
         try {
-            $client = new Client([
-                'default' => [
-                    'headers' => [
-                        'X-API-ID' => $this->apiId,
-                        'X-API-TOKEN' => $this->apiToken,
-                        'Content-Type' => 'application/json'
-                    ]
-                ]
-            ]);
-            $url = $this->url . '/' . $endpoint;
-
             if (isset($options['json'])) {
                 $options['json'] = json_encode($options['json']);
             }
 
-            $response = $client->request($method, $url, $options);
+            $response = $this->client->request($method, $endpoint, $options);
 
             return json_decode($response->getBody(), true);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
+            return null;
         }
-        return null;
+    }
+
+    /**
+     * Retrieve parcels based on tracking numbers
+     *
+     * @param array $trackings List of tracking numbers
+     * @return array|null Response data from API
+     */
+    public function retrieveParcels(array $trackings = []): ?array
+    {
+        $options = $trackings ? ['query' => ['tracking' => implode(',', $trackings)]] : [];
+        return $this->request('GET', 'parcels', $options);
+    }
+
+    /**
+     * Create new parcels
+     *
+     * @param array $parcels List of parcels to create
+     * @return array|null Response data from API
+     */
+    public function createParcels(array $parcels): ?array
+    {
+        return $this->request('POST', 'parcels', ['json' => $parcels]);
+    }
+
+    /**
+     * Delete parcels based on tracking numbers
+     *
+     * @param array $trackings List of tracking numbers
+     * @return array|null Response data from API
+     */
+    public function deleteParcels(array $trackings): ?array
+    {
+        $options = $trackings ? ['query' => ['tracking' => implode(',', $trackings)]] : [];
+        return $this->request('DELETE', 'parcels', $options);
+    }
+
+    /**
+     * Retrieve delivery fees based on wilaya IDs
+     *
+     * @param array $wilayaIds List of wilaya IDs
+     * @return array|null Response data from API
+     */
+    public function retrieveDeliveryfees(array $wilayaIds = []): ?array
+    {
+        $options = $wilayaIds ? ['query' => ['wilaya_id' => implode(',', $wilayaIds)]] : [];
+        return $this->request('GET', 'deliveryfees', $options);
+    }
+
+    /**
+     * Retrieve archived parcels based on status
+     *
+     * @param string|null $status Status of parcels to retrieve
+     * @return array|null Response data from API
+     */
+    public function retrieveHistoryParcels(?string $status): ?array
+    {
+        $options = $status ? ['query' => ['status' => $status]] : [];
+        return $this->request('GET', 'histories', $options);
     }
 }

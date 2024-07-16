@@ -11,8 +11,19 @@
         {
             "name": "sebbah nouri",
             "email": "sebbahnouri@gmail.com"
+        },
+        {
+            "name": "Adnane Kadri",
+            "email": "contact@adnane.tech"
         }
     ],
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Sebbahnouri\\Yalidine\\Providers\\YaledineServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "stable",
     "require": {
         "php": "^8.1",
