@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Log;
 
 class Yalidine
 {
-
     private string $url = "https://api.yalidine.com/v1/";
     private string $apiId;
     private string $apiToken;
@@ -18,6 +17,12 @@ class Yalidine
         $this->apiToken = config('Yale-config.api_token');
     }
 
+    /**
+     * Retrieve parcels based on tracking numbers
+     *
+     * @param array $trackings List of tracking numbers
+     * @return array|null Response data from API
+     */
     public function retrieveParcels(array $trackings = [])
     {
         $options = [];
@@ -32,6 +37,13 @@ class Yalidine
         //TODO:create a jsonserialize class to represent the response
         return $response;
     }
+
+    /**
+     * Create new parcels
+     *
+     * @param array $parcels List of parcels to create
+     * @return array|null Response data from API
+     */
     public function createParcels(array $parcels)
     {
         $options = [
@@ -43,6 +55,12 @@ class Yalidine
         return $response;
     }
 
+    /**
+     * Delete parcels based on tracking numbers
+     *
+     * @param array $trackings List of tracking numbers
+     * @return array|null Response data from API
+     */
     public function deleteParcels(array $trackings)
     {
         $options = [];
@@ -57,6 +75,13 @@ class Yalidine
         //TODO:create a jsonserialize class to represent the response
         return $response;
     }
+
+    /**
+     * Retrieve delivery fees based on wilaya IDs
+     *
+     * @param array $wilayaIds List of wilaya IDs
+     * @return array|null Response data from API
+     */
     public function retrieveDeliveryfees(array $wilayaIds = [])
     {
         $options = [];
@@ -72,6 +97,12 @@ class Yalidine
         return $response;
     }
 
+    /**
+     * Retrieve archived parcels based on status
+     *
+     * @param string|null $status Status of parcels to retrieve
+     * @return array|null Response data from API
+     */
     public function retrieveHistoryParcels(?string $status) // the param should be an enum of all the status 
     {
         $options = [];
@@ -86,7 +117,13 @@ class Yalidine
         return $response; 
     }
 
-
+    /**
+     * Initiate a request & return data
+     * @param string $method
+     * @param string $endpoint
+     * @param array $options
+     * @return mixed
+    */
     private function request(string $method, string $endpoint, array $options): ?array
     {
         try {
